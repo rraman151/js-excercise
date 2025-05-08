@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>D3 POST Request Example</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      border: 1px solid #ddd;
+      overflow-x: auto;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>D3 POST Request Example</h1>
+  <p>Sending JSON data to <code>https://httpbin.org/post</code></p>
+  <div id="status"></div>
+  <pre id="response"></pre>
+
+  <script>
+    const url = "https://httpbin.org/post";
+    const postData = {
+      name: "Waldo Ma",
+      email: "waldo@example.com",
+      age: 75
+    };
+
+    d3.json(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(postData)
+    })
+    .then(response => {
+      document.getElementById("status").textContent = "✅ POST Request Successful!";
+      document.getElementById("status").className = "success";
+      document.getElementById("response").textContent = JSON.stringify(response, null, 2);
+    })
+    .catch(error => {
+      document.getElementById("status").textContent = "❌ POST Request Failed!";
+      document.getElementById("status").className = "error";
+      document.getElementById("response").textContent = error;
+    });
+  </script>
+</body>
+</html>

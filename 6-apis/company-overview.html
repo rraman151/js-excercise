@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rohit - Company Overview (JSON)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      color: #2c3e50;
+    }
+
+    a {
+      color: #2980b9;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input, button {
+      padding: 8px;
+      font-size: 1rem;
+      margin: 5px 0;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    #display-company-info {
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #display-company-info p {
+      margin-bottom: 10px;
+    }
+
+    #display-link {
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Company Overview (JSON)</h1>
+  <a href="../index.html">← Home</a>
+
+  <h2>Dataset Information</h2>
+  <p>
+    This project uses data from the <a href="https://www.alphavantage.co/documentation/#company-overview" target="_blank">AlphaVantage API</a> "Company Overview" endpoint to show financial details for public companies.
+  </p>
+
+  <h2>Setup</h2>
+  <p>You will be prompted to enter your AlphaVantage API Key.</p>
+
+  <h2>Lookup</h2>
+  <label for="input-symbol">Stock Symbol:</label>
+  <input id="input-symbol" type="text" placeholder="NFLX" value="NFLX" />
+  <button id="lookup">Lookup</button>
+
+  <div id="display-company-info">
+    <p><strong>Name:</strong> <span id="display-name">Loading...</span></p>
+    <p><strong>Description:</strong> <span id="display-description">Loading...</span></p>
+    <p><strong>Website:</strong> <a id="display-link" href="#" target="_blank">Loading...</a></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script>
+    const apiKey = prompt("Enter your AlphaVantage API key:");
+    const inputSymbol = document.getElementById("input-symbol");
+    const lookupButton = document.getElementById("lookup");
+    const displayName = document.getElementById("display-name");
+    const displayDescription = document.getElementById("display-description");
+    const displayLink = document.getElementById("display-link");
+
+    function lookupCompany() {
+      const symbol = inputSymbol.value.trim().toUpperCase();
+      if (!symbol) return;
+
+      const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${apiKey}`;
+
+      d3.json(url).then(data => {
+        console.log("Company Overview:", data);
+
+        displayName.textContent = data.Name || "N/A";
+        displayDescription.textContent = data.Description || "N/A";
+        if (data.Website) {
+          displayLink.href = data.Website;
+          displayLink.textContent = data.Website;
+        } else {
+          displayLink.href = "#";
+          displayLink.textContent = "N/A";
+        }
+      }).catch(err => {
+        console.error("Fetch error:", err);
+        displayName.textContent = "Error fetching data";
+        displayDescription.textContent = "Please check your API key or symbol.";
+        displayLink.textContent = "N/A";
+        displayLink.href = "#";
+      });
+    }
+
+    // Load once by default
+    lookupCompany();
+    // Button click
+    lookupButton.addEventListener("click", lookupCompany);
+  </script>
+
+</body>
+</html>

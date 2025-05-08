@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Harry Potter Movies (JSON) - Rohit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    h1, h2 {
+      color: #2c3e50;
+    }
+
+    select {
+      font-size: 16px;
+      padding: 6px;
+      margin-top: 10px;
+    }
+
+    #display-movie {
+      margin-top: 20px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      max-width: 500px;
+    }
+
+    #display-movie p {
+      margin: 8px 0;
+      font-size: 16px;
+    }
+
+    #image-container img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+
+    #display-movie span {
+      font-weight: bold;
+    }
+
+    a {
+      color: #0077cc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Harry Potter Movies (JSON)</h1>
+  <a href="../index.html">Home</a>
+
+  <h2>Dataset Information</h2>
+  <p>
+    For this exercise, we will use a JSON file called
+    <a href="https://raw.githubusercontent.com/prof-rossetti/internet-technologies/refs/heads/main/data/hp-movies.json">"hp-movies.json"</a>.
+    The JSON file contains information about Harry Potter movies.
+  </p>
+
+  <h2>Part 1</h2>
+  <p>
+    Write JavaScript code to answer the questions below.
+    Log each of the answers to the console.
+  </p>
+  <ol type="A">
+    <li>Fetch the movie data using the provided URL.</li>
+    <li>Display the number of movies.</li>
+    <li>Loop through the movies, and display the title and year of each.</li>
+    <li>Identify the highest-rated movie and display its title and rating.</li>
+  </ol>
+
+  <h2>Part 2</h2>
+  <p>Use JavaScript to dynamically populate the dropdown and show selected movie info below.</p>
+  <ol type="A">
+    <li>Populate the dropdown with movie titles.</li>
+    <li>Create <code>updateMovieInfo</code> to show title, year, rating, and poster.</li>
+    <li>Listen for dropdown changes and call the update function.</li>
+  </ol>
+
+  <hr>
+
+  <h2>Display</h2>
+  <select id="select-movie" name="movie">
+    <option value="N/A">Select a Movie</option>
+  </select>
+
+  <div id="display-movie">
+    <p>Title: <span id="display-title">Please select a movie</span></p>
+    <p>Year: <span id="display-year">--</span></p>
+    <p>Rating: <span id="display-rating">--</span> / 10</p>
+    <p>Thumbnail Image:</p>
+    <div id="image-container"></div>
+  </div>
+
+  <script type="text/javascript">
+    const requestUrl = "https://raw.githubusercontent.com/prof-rossetti/internet-technologies/refs/heads/main/data/hp-movies.json";
+
+    fetch(requestUrl)
+      .then(response => response.json())
+      .then(function(movies) {
+        console.log("---------------------");
+        console.log("PART 1...");
+
+        // A. Number of movies
+        console.log(`Number of movies: ${movies.length}`);
+
+        // B. Title and year of each
+        movies.forEach(m => {
+          console.log(`${m.Title} (${m.Year})`);
+        });
+
+        // C. Highest-rated movie
+        const top = movies.reduce((best, m) => m.Rating > best.Rating ? m : best, movies[0]);
+        console.log(`Highest rated: ${top.Title} with rating ${top.Rating}`);
+
+        console.log("---------------------");
+        console.log("PART 2...");
+
+        // Populate dropdown
+        const select = document.getElementById("select-movie");
+        movies.forEach(m => {
+          const opt = document.createElement("option");
+          opt.value = m.Id;
+          opt.textContent = m.Title;
+          select.appendChild(opt);
+        });
+
+        // Update display on selection
+        function updateMovieInfo() {
+          const id = select.value;
+          const movie = movies.find(m => m.Id === id);
+          if (!movie) return;
+
+          document.getElementById("display-title").textContent = movie.Title;
+          document.getElementById("display-year").textContent = movie.Year;
+          document.getElementById("display-rating").textContent = movie.Rating;
+          const imgCont = document.getElementById("image-container");
+          imgCont.innerHTML = `<img src="${movie["Thumbnail Image URL"]}" alt="${movie.Title} poster">`;
+        }
+
+        select.addEventListener("change", updateMovieInfo);
+      })
+      .catch(err => console.error("Error fetching movie data:", err));
+  </script>
+
+</body>
+</html>

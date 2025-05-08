@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rohit - Market Status (JSON)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #004085;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #display-market-info {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 600px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+        #display-market-info p {
+            margin: 10px 0;
+        }
+        span {
+            font-weight: bold;
+        }
+        #display-status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+        }
+        .open {
+            background-color: #28a745;
+        }
+        .closed {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Market Status (JSON)</h1>
+    <a href="../index.html">← Home</a>
+
+    <p>
+        This page fetches data from the
+        <a href="https://www.alphavantage.co/documentation/#market-status" target="_blank">AlphaVantage Market Status API</a>
+        and shows the current status of U.S. equity markets.
+    </p>
+
+    <div id="display-market-info">
+        <p>📍 Region: <span id="display-region">Loading...</span></p>
+        <p>🏛️ Market Type: <span id="display-type">Loading...</span></p>
+        <p>🏢 Primary Exchanges: <span id="display-exchanges">Loading...</span></p>
+        <p>🕒 Local Open: <span id="display-open">Loading...</span></p>
+        <p>🕔 Local Close: <span id="display-close">Loading...</span></p>
+        <p>📈 Current Status: <span id="display-status">Loading...</span></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script>
+        const apiKey = prompt("Enter your AlphaVantage API key:");
+        const url = `https://www.alphavantage.co/query?function=MARKET_STATUS&apikey=${apiKey}`;
+
+        d3.json(url).then(data => {
+            const markets = data.markets || [];
+            const equityMarkets = markets.filter(m => m.market_type === "Equity");
+            const usMarket = equityMarkets.find(m => m.region === "United States");
+
+            if (!usMarket) {
+                alert("U.S. equity market data not found.");
+                return;
+            }
+
+            const exchanges = usMarket.primary_exchanges.split(",").map(s => s.trim());
+
+            document.getElementById("display-region").textContent = usMarket.region;
+            document.getElementById("display-type").textContent = usMarket.market_type;
+            document.getElementById("display-exchanges").textContent = exchanges.join(", ");
+            document.getElementById("display-open").textContent = usMarket.local_open;
+            document.getElementById("display-close").textContent = usMarket.local_close;
+
+            const statusEl = document.getElementById("display-status");
+            statusEl.textContent = usMarket.current_status.toUpperCase();
+            if (usMarket.current_status.toLowerCase() === "open") {
+                statusEl.classList.add("open");
+            } else {
+                statusEl.classList.add("closed");
+            }
+
+        }).catch(err => {
+            console.error("Fetch error:", err);
+            alert("Failed to load market data.");
+        });
+    </script>
+</body>
+</html>

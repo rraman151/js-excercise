@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Forecast (JSON) - Rohit</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1, h2 {
+      color: #2c3e50;
+    }
+
+    a {
+      color: #0077cc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #weather-app {
+      margin-top: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 800px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px 10px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background-color: #0077cc;
+      color: white;
+    }
+
+    img {
+      max-width: 60px;
+      height: auto;
+    }
+
+    @media screen and (max-width: 600px) {
+      td, th {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Weather Forecast (JSON)</h1>
+  <a href="../index.html">Home</a>
+
+  <h2>Dataset Information</h2>
+  <p>
+    For this exercise, we will use a JSON file called
+    <a href="https://raw.githubusercontent.com/prof-rossetti/internet-technologies/refs/heads/main/data/weather-data.json">"weather-data.json"</a>
+    that contains weather forecast data originally retrieved from the Weather.gov API.
+  </p>
+
+  <h2>Part 1</h2>
+  <ol type="A">
+    <li>Fetch the weather data using the provided URL.</li>
+    <li>Display the date this data was generated.</li>
+    <li>Display the number of available periods.</li>
+    <li>Filter out only the daytime periods and store in <code>daytimePeriods</code>.</li>
+    <li>Display number of daytime periods.</li>
+    <li>Log human-readable forecasts for each daytime period.</li>
+  </ol>
+
+  <h2>Part 2</h2>
+  <ol type="A">
+    <li>Display the generated date below.</li>
+    <li>Show the seven-day forecast table with period, temperature, forecast, and icon.</li>
+  </ol>
+
+  <hr>
+
+  <h2>Display</h2>
+  <div id="weather-app">
+    <p><strong>Date:</strong> <span id="display-date">Loading...</span></p>
+    <p><strong>Seven Day Forecast:</strong></p>
+    <table id="display-forecast">
+      <!-- Populated by JavaScript -->
+    </table>
+  </div>
+
+  <script>
+    const degreeSymbol = "\u00B0";
+    const requestUrl = "https://raw.githubusercontent.com/prof-rossetti/internet-technologies/refs/heads/main/data/weather-data.json";
+
+    fetch(requestUrl)
+      .then(resp => resp.json())
+      .then(data => {
+        console.log("DATA", data);
+
+        console.log("---------------------");
+        console.log("PART 1...");
+        const generatedAt = data.properties.generatedAt.slice(0, 10);
+        console.log("Date generated:", generatedAt);
+
+        const periods = data.properties.periods;
+        console.log("Total periods:", periods.length);
+
+        const daytimePeriods = periods.filter(p => p.isDaytime);
+        console.log("Daytime periods count:", daytimePeriods.length);
+
+        daytimePeriods.forEach(p => {
+          console.log(`${p.name}: ${p.temperature}${degreeSymbol}${p.temperatureUnit} – ${p.shortForecast}`);
+        });
+
+        console.log("---------------------");
+        console.log("PART 2...");
+
+        document.getElementById("display-date").textContent = generatedAt;
+
+        const table = document.getElementById("display-forecast");
+        table.innerHTML = `
+          <tr>
+            <th>Period</th>
+            <th>Temperature</th>
+            <th>Forecast</th>
+            <th>Icon</th>
+          </tr>
+        `;
+
+        daytimePeriods.forEach(p => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${p.name}</td>
+            <td>${p.temperature}${degreeSymbol}${p.temperatureUnit}</td>
+            <td>${p.shortForecast}</td>
+            <td><img src="${p.icon}" alt="${p.shortForecast}" /></td>
+          `;
+          table.appendChild(row);
+        });
+      })
+      .catch(err => {
+        console.error("Error fetching weather data:", err);
+        document.getElementById("display-date").textContent = "Error loading data.";
+      });
+  </script>
+</body>
+</html>

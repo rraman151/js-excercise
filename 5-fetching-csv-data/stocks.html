@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stocks (CSV) - Rohit</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f9fc;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1, h2 {
+      color: #2c3e50;
+    }
+
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    p span {
+      font-weight: bold;
+    }
+
+    hr {
+      margin: 30px 0;
+      border: none;
+      border-top: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Stocks (CSV)</h1>
+  <a href="../index.html">Home</a>
+
+  <h2>Dataset Information</h2>
+  <p>
+    This exercise uses stock data from CSV files. Each file contains historical stock prices for symbols like:
+    AAPL, GOOGL, MSFT, NFLX, NVDA, and SPOT. Data is originally from the AlphaVantage API and available in files like:
+    <a href="https://raw.githubusercontent.com/prof-rossetti/intro-software-dev-python-book/refs/heads/main/docs/data/daily_adjusted_NFLX.csv" target="_blank">daily_adjusted_NFLX.csv</a>.
+  </p>
+
+  <h2>Part 1</h2>
+  <ol type="A">
+    <li>Select a symbol (e.g., "NFLX").</li>
+    <li>Construct the dataset URL dynamically.</li>
+    <li>Fetch and process the data.</li>
+    <li>Display number of days available.</li>
+    <li>Display earliest date and closing price.</li>
+    <li>Display latest date and closing price.</li>
+    <li>Calculate and display % change from earliest to latest day.</li>
+  </ol>
+
+  <h2>Part 2</h2>
+  <ol type="A">
+    <li>Show this data below using the respective <code>span</code> elements.</li>
+  </ol>
+
+  <hr />
+  <h2>Display</h2>
+  <p>Symbol: <span id="display-symbol">TODO</span></p>
+  <p>Earliest: <span id="display-earliest">TODO</span></p>
+  <p>Latest: <span id="display-latest">TODO</span></p>
+  <p>Percent Change: <span id="display-pct-change">TODO</span></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script>
+    // Helper functions
+    const formatUSD = price => `$${price.toFixed(2)}`;
+    const formatPct = pct => `${(pct * 100).toFixed(2)}%`;
+
+    // A) Select symbol
+    const symbol = "NFLX";
+    const filename = `daily_adjusted_${symbol}.csv`;
+    const requestUrl = `https://raw.githubusercontent.com/prof-rossetti/intro-software-dev-python-book/refs/heads/main/docs/data/${filename}`;
+
+    d3.csv(requestUrl).then(data => {
+      data.forEach(d => d.adjusted_close = parseFloat(d.adjusted_close));
+
+      const totalDays = data.length;
+      console.log("Number of Days:", totalDays);
+
+      const latest = data[0]; // most recent
+      const earliest = data[data.length - 1]; // oldest
+
+      console.log("Earliest:", earliest.timestamp, formatUSD(earliest.adjusted_close));
+      console.log("Latest:", latest.timestamp, formatUSD(latest.adjusted_close));
+
+      const pctChange = (latest.adjusted_close - earliest.adjusted_close) / earliest.adjusted_close;
+      console.log("Change:", formatPct(pctChange));
+
+      // DOM output
+      document.getElementById("display-symbol").textContent = symbol;
+      document.getElementById("display-earliest").textContent = `${earliest.timestamp} ${formatUSD(earliest.adjusted_close)}`;
+      document.getElementById("display-latest").textContent = `${latest.timestamp} ${formatUSD(latest.adjusted_close)}`;
+      document.getElementById("display-pct-change").textContent = formatPct(pctChange);
+    }).catch(err => console.error("Error fetching stock data:", err));
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tweets - Rohit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/d3-array@3"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f4f7fa;
+      color: #2c3e50;
+      padding: 40px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      color: #1f4e79;
+    }
+
+    h2 {
+      color: #34495e;
+      margin-top: 30px;
+    }
+
+    a {
+      text-decoration: none;
+      color: #2980b9;
+      font-weight: bold;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    hr {
+      margin: 30px 0;
+      border: none;
+      border-top: 1px solid #ccc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #ffffff;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background-color: #e3edf7;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9fbfd;
+    }
+
+    tr:hover {
+      background-color: #eef3f7;
+    }
+
+    ol {
+      padding-left: 20px;
+    }
+
+    code {
+      background-color: #eef2f4;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Tweets</h1>
+  <a href="../index.html">Home</a>
+
+  <h2>Part 1</h2>
+  <p>
+    Write JavaScript code to process the provided <code>tweets</code> variable to answer the questions below.
+    Log each of the answers to the console.
+  </p>
+  <ol type="A">
+    <li>Display the screen name of the user who authored the first tweet (i.e. "@sandwoah").</li>
+    <li>Of all the tweets which include the phrase "@sandwoah" in their full text, display the screen name of the user who authored that tweet, each on a separate line.</li>
+    <li>Of all such tweets, determine which has the greatest number of likes, and then display that user's screen name.</li>
+  </ol>
+
+  <hr>
+
+  <h2>Part 2</h2>
+  <p>
+    Sort the tweets by likes in descending order and display them in a table with the following columns:
+  </p>
+  <ul>
+    <li>Tweet Id</li>
+    <li>Tweet Text</li>
+    <li>User Screen Name</li>
+    <li>User Followers</li>
+    <li>Likes</li>
+  </ul>
+
+  <table id="social-feed"></table>
+
+  <script>
+    const tweets = [
+      {id: 100200297, full_text: "Its a delicoius pancake!", img_url: "https://sandwoah.com/sandwich.png", user: {screen_name: "sandwoah", followers: 3000}, likes_count: 370},
+      {id: 100200298, full_text: "I love coffee", img_url: null, user: {screen_name: "user_1", followers: 200}, likes_count: 50},
+      {id: 100200299, full_text: "@sandwoah yumm...", img_url: null, user: {screen_name: "user_2", followers: 387}, likes_count: 88},
+      {id: 100200300, full_text: "@sandwoah that pancake looks amazing!!", img_url: null, user: {screen_name: "user_3", followers: 152}, likes_count: 38},
+      {id: 100200301, full_text: "I ate a great pancake today", img_url: null, user: {screen_name: "user_4", followers: 520}, likes_count: 62}
+    ];
+
+    console.log("---------------------");
+    console.log("PART 1...");
+    // A)
+    console.log(tweets[0].user.screen_name);
+
+    // B)
+    tweets
+      .filter(t => t.full_text.includes("@sandwoah"))
+      .forEach(t => console.log(t.user.screen_name));
+
+    // C)
+    const tagged = tweets.filter(t => t.full_text.includes("@sandwoah"));
+    const topTaggedTweet = tagged.reduce((a, b) => b.likes_count > a.likes_count ? b : a);
+    console.log(topTaggedTweet.user.screen_name);
+
+    console.log("---------------------");
+    console.log("PART 2...");
+
+    // Sort by likes descending
+    const sorted = [...tweets].sort((a, b) => b.likes_count - a.likes_count);
+
+    // Build table
+    const tbl = document.getElementById("social-feed");
+    tbl.innerHTML = `
+      <tr>
+        <th>Tweet Id</th>
+        <th>Tweet Text</th>
+        <th>User Screen Name</th>
+        <th>User Followers</th>
+        <th>Tweet Likes</th>
+      </tr>
+    ` + sorted.map(t => `
+      <tr>
+        <td>${t.id}</td>
+        <td>${t.full_text}</td>
+        <td>${t.user.screen_name}</td>
+        <td>${t.user.followers}</td>
+        <td>${t.likes_count}</td>
+      </tr>
+    `).join("");
+  </script>
+
+</body>
+</html>

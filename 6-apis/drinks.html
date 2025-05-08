@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rohit - Non-alcoholic Drinks (JSON)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #2c3e50;
+    }
+
+    a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #display-drinks {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    #display-drinks div {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      text-align: center;
+    }
+
+    #display-drinks img {
+      border-radius: 5px;
+      margin-top: 10px;
+      width: 100%;
+      max-width: 150px;
+      height: auto;
+    }
+
+    #display-drinks-count {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Non-alcoholic Drinks (JSON)</h1>
+  <a href="../index.html">← Home</a>
+
+  <h2>Dataset Information</h2>
+  <p>
+    For this exercise, we use data from the
+    <a href="https://www.thecocktaildb.com/api.php" target="_blank">CocktailDB API</a>,
+    specifically the “Filter by alcoholic” endpoint to list non-alcoholic drinks.
+  </p>
+
+  <h2>Part 1</h2>
+  <p>Drink data is logged to the console.</p>
+
+  <h2>Part 2</h2>
+  <p>Total non-alcoholic drinks: <span id="display-drinks-count">Loading...</span></p>
+
+  <div id="display-drinks"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script type="text/javascript">
+    const requestUrl = "https://www.thecocktaildb.com/api/json/v1/1/filter.php?a=Non_Alcoholic";
+
+    d3.json(requestUrl)
+      .then(data => {
+        const drinks = data.drinks;
+
+        console.log("----------- PART 1 -----------");
+        console.log("Number of drinks:", drinks.length);
+        drinks.forEach(drink => console.log(`${drink.strDrink} (${drink.idDrink})`));
+
+        document.getElementById("display-drinks-count").textContent = drinks.length;
+
+        const container = document.getElementById("display-drinks");
+        drinks.forEach(({ strDrink, strDrinkThumb }) => {
+          const div = document.createElement("div");
+          div.innerHTML = `
+            <p><strong>${strDrink}</strong></p>
+            <img src="${strDrinkThumb}" alt="${strDrink}">
+          `;
+          container.appendChild(div);
+        });
+      })
+      .catch(err => console.error("Error fetching drink data:", err));
+  </script>
+
+</body>
+</html>
